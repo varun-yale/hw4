@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs: App Check (HW4 Problem 11)</title>
+<style>
+  :root { --paper:#fbf8f2; --ink:#16202e; --soft:#4a5566; --line:#e4ddcf; --yale:#00356b; --brass:#b08d57; --ok:#1f7a4d; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.6 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header { background:var(--yale); color:#fff; padding:36px 24px 30px; }
+  header .wrap, main { max-width:1100px; margin:0 auto; }
+  header p { margin:4px 0 0; color:#d3dfec; }
+  h1, h2 { font-family: Georgia, "Times New Roman", serif; font-weight:600; line-height:1.2; }
+  h1 { margin:0; font-size:2.1rem; }
+  main { padding:28px 24px 60px; }
+  .summary { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin-bottom:28px; }
+  .summary ul { margin:6px 0 0; padding-left:20px; }
+  section { background:#fff; border:1px solid var(--line); border-radius:14px; padding:24px; margin-bottom:30px; box-shadow:0 2px 10px rgba(0,36,74,.05); }
+  .label { text-transform:uppercase; letter-spacing:.14em; font-size:.75rem; font-weight:700; color:var(--brass); margin:0; }
+  h2 { margin:4px 0 10px; font-size:1.55rem; }
+  .proof { font-size:1.02rem; color:var(--soft); margin:0 0 16px; }
+  .proof strong { color:var(--ink); }
+  .prompt { background:#f3eee3; border-left:4px solid var(--yale); padding:10px 14px; border-radius:6px; margin:0 0 16px; font-size:.95rem; }
+  figure { margin:0 0 16px; }
+  figure a { display:block; }
+  img { width:100%; height:auto; border:1px solid var(--line); border-radius:10px; }
+  figcaption { font-size:.85rem; color:var(--soft); margin-top:6px; }
+  table { width:100%; border-collapse:collapse; font-size:.9rem; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { background:#f7f3ea; font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--soft); }
+  .ok { color:var(--ok); font-weight:700; white-space:nowrap; }
+  code { background:#f3eee3; padding:1px 5px; border-radius:4px; font-size:.85em; }
+  footer { color:var(--soft); font-size:.85rem; text-align:center; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Campus Customs: Live App Check</h1>
+  <p>HW4 Problem 11 · Tested on the running site (React front end at <code style="background:rgba(255,255,255,.15);color:#fff">localhost:5173</code>, FastAPI + PydanticAI backend at <code style="background:rgba(255,255,255,.15);color:#fff">localhost:8000</code>) on September 26, 2026</p>
+</div></header>
+<main>
+  <div class="summary">
+    <strong>Three checks, all passed.</strong> Each screenshot was taken in a real Chrome browser on the live site, and every number the chatbot or page showed was checked with a direct SQLite query on <code>data-2/campus_customs.db</code> (tables below each screenshot). Click any screenshot to open it full size.
+    <ul>
+      <li><a href="#check-1">Check 1: Chat checks an item's inventory and price</a></li>
+      <li><a href="#check-2">Check 2: Hoodie search puts product cards on the page</a></li>
+      <li><a href="#check-3">Check 3 (Problem 9 feature): Sold-out size feedback and in-stock alternatives</a></li>
+    </ul>
+  </div>
+
+  <section id="check-1">
+    <p class="label">Check 1</p>
+    <h2>Chat checks inventory and price from the database</h2>
+    <p class="proof">Asked on the Boola Boola T-Shirt page, the chatbot answered <strong>$32, 15 left in medium, large sold out</strong>, and suggested in-stock large alternatives. Every number matches the database exactly, so the bot is reading real stock rather than guessing.</p>
+    <p class="prompt"><strong>Shopper:</strong> “Do you have the Boola Boola T-Shirt in medium and large? How much is it?”<br><strong>Bot:</strong> “The Boola Boola T Shirt is $32. Medium is available with 15 in stock, but Large is sold out. Other sizes available are XS, S, XL, and XXL. For a Large, the closest alternatives are the District Tri Blend T Shirt Vintage Shield ($32, 8 left) and the Grace Hopper Logo T Shirt ($32, 8 left); the 2025 Yale Vs Harvard T Shirt is also available ($32, 2 left).”</p>
+    <figure><a href="app_check_images/1_inventory_chat.png"><img src="app_check_images/1_inventory_chat.png" alt="Chat answering Boola Boola T-Shirt price and stock for medium and large"></a>
+      <figcaption>app_check_images/1_inventory_chat.png</figcaption></figure>
+    <table><thead><tr><th>What the chatbot said</th><th>Chat answer</th><th>campus_customs.db</th><th></th></tr></thead><tbody><tr><td>Price</td><td>$32</td><td>$32.00</td><td><span class="ok">✓ match</span></td></tr><tr><td>Medium (M) stock</td><td>15 in stock</td><td>15</td><td><span class="ok">✓ match</span></td></tr><tr><td>Large (L) stock</td><td>sold out</td><td>0</td><td><span class="ok">✓ match</span></td></tr><tr><td>Alternatives in L</td><td>District Tri Blend Vintage Shield 8 · Grace Hopper Logo 8 · 2025 Yale Vs Harvard 2 (all $32)</td><td>8 · 8 · 2 (all $32.00)</td><td><span class="ok">✓ match</span></td></tr></tbody></table>
+  </section>
+
+  <section id="check-2">
+    <p class="label">Check 2</p>
+    <h2>Category search puts product cards on the page</h2>
+    <p class="proof">The chatbot <strong>updated the page dynamically</strong>: asking “What hoodies do you have?” on the Home page switched the site to the Products page, which rendered a “Yale hoodies · 27 items” banner and <strong>27 product cards</strong>. The screenshot shows the first row; the rest are below. That count matches the bot's reply and the same 27 hoodies in the database, and each card opens its Problem 3 detail page.</p>
+    <p class="prompt"><strong>Shopper:</strong> “What hoodies do you have?”<br><strong>Bot:</strong> “I found 27 hoodies, including the Basic Hoodie Big Yale, Champion Reverse Weave Hoodie, Yale Dad Hoodie, and several Yale sports styles. They’re shown on the page—prices range from $45 to $88.”</p>
+    <figure><a href="app_check_images/2_hoodie_search_cards.png"><img src="app_check_images/2_hoodie_search_cards.png" alt="Products page showing Yale hoodies results banner and hoodie cards from the chat search"></a>
+      <figcaption>app_check_images/2_hoodie_search_cards.png</figcaption></figure>
+    <table><thead><tr><th>Check</th><th>On the site</th><th>Verified</th><th></th></tr></thead><tbody><tr><td>Hoodie cards on the page</td><td>27</td><td>27 hoodies in the catalogue</td><td><span class="ok">✓ match</span></td></tr><tr><td>Same products?</td><td>27 names on the page</td><td>the same 27 names as the SQL query</td><td><span class="ok">✓ match</span></td></tr><tr><td>Card click</td><td>“Basic Hoodie Big Yale”</td><td>opened <code>/products/basic-hoodie-big-yale</code> (the Problem 3 detail page)</td><td><span class="ok">✓ match</span></td></tr></tbody></table>
+  </section>
+
+  <section id="check-3">
+    <p class="label">Check 3 · Problem 9 usability feature</p>
+    <h2>Sold-out size feedback with in-stock alternatives</h2>
+    <p class="proof">On the Ice Hockey Left Chest Hoodie, sold-out sizes are struck through. Picking <strong>M</strong> shows a clear “Size M is sold out. Still available in: XS, S, XXL” message and a <strong>“Similar items in stock in size M”</strong> row with real stock counts, so a sold-out size is no longer a dead end. Shoppers immediately see what they <em>can</em> buy in their size instead of leaving the page.</p>
+    <figure><a href="app_check_images/3_soldout_size_alternatives.png"><img src="app_check_images/3_soldout_size_alternatives.png" alt="Product page with size M sold out message and four similar hoodies in stock in M"></a>
+      <figcaption>app_check_images/3_soldout_size_alternatives.png</figcaption></figure>
+    <table><thead><tr><th>Item</th><th>Page shows</th><th>campus_customs.db</th><th></th></tr></thead><tbody><tr><td>Ice Hockey Left Chest Hoodie, size M</td><td>Sold out</td><td>0 in M</td><td><span class="ok">✓ match</span></td></tr><tr><td>“Still available in”</td><td>XS, S, XXL</td><td>XS 20 · S 8 · XXL 25 (L, XL = 0)</td><td><span class="ok">✓ match</span></td></tr><tr><td>Yale Sports Hoodie Hockey</td><td>5 left in M</td><td>5 in M, $68.00</td><td><span class="ok">✓ match</span></td></tr><tr><td>Squash Left Chest Hoodie</td><td>5 left in M</td><td>5 in M, $68.00</td><td><span class="ok">✓ match</span></td></tr><tr><td>Fencing Left Chest Hoodie</td><td>15 left in M</td><td>15 in M, $68.00</td><td><span class="ok">✓ match</span></td></tr><tr><td>Sailing Left Chest Hoodie</td><td>25 left in M</td><td>25 in M, $68.00</td><td><span class="ok">✓ match</span></td></tr></tbody></table>
+  </section>
+
+  <footer>Campus Customs · HW4 Problem 11 app check · Images are in <code>output/app_check_images/</code> and linked with relative paths.</footer>
+</main>
+</body>
+</html>

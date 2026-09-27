@@ -1,0 +1,35 @@
+# --- Secrets: never commit ---
+.env
+.env.*
+!.env.example
+
+# --- Local data pack (graders supply their own copy) ---
+data/
+data-2/
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# --- Node / Vite ---
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+.vite/
+
+# --- Audit trail helpers (the audit_trail.json itself IS committed) ---
+output/audit_trail.lock
+output/audit_trail.corrupt-*.json
+output/*.tmp
+
+# --- OS / editor junk ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
