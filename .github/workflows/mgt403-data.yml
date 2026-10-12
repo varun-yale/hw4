@@ -1,0 +1,35 @@
+name: Build MGT403 public data
+
+on:
+  push:
+    branches: [mgt403-data-build]
+    paths:
+      - "mgt403_data/**"
+      - ".github/workflows/mgt403-data.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: mgt403-data-build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r mgt403_data/requirements.txt
+      - name: Build source datasets
+        run: python mgt403_data/build_public_sources.py
+      - name: Commit generated CSVs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mgt403_data/output mgt403_data/raw/.gitkeep || true
+          git commit -m "Build MGT403 public source datasets" || exit 0
+          git push origin HEAD:mgt403-data-build
